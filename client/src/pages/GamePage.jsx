@@ -148,9 +148,11 @@ export default function GamePage() {
           </Link>
 
           <div className='flex justify-between text-sm sm:text-lg'>
-            <div>{timeLeft}</div>
+            <div className='font-bold'>
+              {timeLeft}
+            </div>
 
-            <div>
+            <div className='font-bold'>
               {game.totalVotes}{' '}
               participants
             </div>
