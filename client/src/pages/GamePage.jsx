@@ -1,6 +1,8 @@
 import React from 'react'
 import { useEffect, useState } from 'react'
+
 import gameImage from '../assets/game.png'
+import bgGif from '../assets/background.gif'
 
 import {
   Link,
@@ -17,8 +19,12 @@ export default function GamePage() {
   const navigate = useNavigate()
 
   const [game, setGame] = useState(null)
-  const [selected, setSelected] = useState(null)
-  const [timeLeft, setTimeLeft] = useState('')
+
+  const [selected, setSelected] =
+    useState(null)
+
+  const [timeLeft, setTimeLeft] =
+    useState('')
 
   useEffect(() => {
     loadGame()
@@ -33,14 +39,19 @@ export default function GamePage() {
       updateTimer()
     }, 1000)
 
-    return () => clearInterval(interval)
+    return () =>
+      clearInterval(interval)
   }, [game])
 
   const loadGame = async () => {
     try {
-      const res = await api.get(`/games/${id}`)
+      const res = await api.get(
+        `/games/${id}`
+      )
 
-      if (res.data.status === 'ended') {
+      if (
+        res.data.status === 'ended'
+      ) {
         navigate('/')
         window.location.reload()
         return
@@ -53,7 +64,9 @@ export default function GamePage() {
       )
 
       if (voteRes.data.voted) {
-        setSelected(voteRes.data.answer)
+        setSelected(
+          voteRes.data.answer
+        )
       }
     } catch {
       navigate('/')
@@ -64,11 +77,14 @@ export default function GamePage() {
     if (!game) return
 
     const diff =
-      new Date(game.endsAt) - new Date()
+      new Date(game.endsAt) -
+      new Date()
 
     if (diff <= 0) {
       try {
-        await api.get(`/games/${id}`)
+        await api.get(
+          `/games/${id}`
+        )
       } catch {}
 
       navigate('/')
@@ -81,12 +97,14 @@ export default function GamePage() {
     )
 
     const mins = Math.floor(
-      (diff % (1000 * 60 * 60)) /
-      (1000 * 60)
+      (diff %
+        (1000 * 60 * 60)) /
+        (1000 * 60)
     )
 
     const secs = Math.floor(
-      (diff % (1000 * 60)) / 1000
+      (diff % (1000 * 60)) /
+        1000
     )
 
     setTimeLeft(
@@ -95,9 +113,12 @@ export default function GamePage() {
   }
 
   const vote = async answer => {
-    await api.post(`/games/${id}/vote`, {
-      answer
-    })
+    await api.post(
+      `/games/${id}/vote`,
+      {
+        answer
+      }
+    )
 
     setSelected(answer)
   }
@@ -105,40 +126,58 @@ export default function GamePage() {
   if (!game) return null
 
   return (
-    <div className='min-h-screen flex flex-col items-center justify-center p-3 sm:p-5'>
-      <div className='w-full max-w-2xl flex flex-col gap-6 sm:gap-8'>
+    <div className='relative min-h-screen overflow-hidden'>
 
-        <Link
-          to='/'
-          className='w-fit bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-xl transition text-sm sm:text-base'
-        >
-          ← Back
-        </Link>
+      <div
+        className='fixed inset-0 -z-10 bg-center bg-no-repeat'
+        style={{
+          backgroundImage: `url(${bgGif})`,
+          backgroundSize: 'cover'
+        }}
+      />
 
-        <div className='flex justify-between text-sm sm:text-lg'>
-          <div>{timeLeft}</div>
+      <div className='min-h-screen bg-black/40 backdrop-blur-sm flex flex-col items-center justify-center p-3 sm:p-5'>
 
-          <div>
-            {game.totalVotes} participants
+        <div className='w-full max-w-2xl flex flex-col gap-6 sm:gap-8'>
+
+          <Link
+            to='/'
+            className='w-fit bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-xl transition text-sm sm:text-base'
+          >
+            ← Back
+          </Link>
+
+          <div className='flex justify-between text-sm sm:text-lg'>
+            <div>{timeLeft}</div>
+
+            <div>
+              {game.totalVotes}{' '}
+              participants
+            </div>
           </div>
+
+          <h1 className='text-2xl sm:text-4xl font-black text-center break-words'>
+            {game.question}
+          </h1>
+
+          <img
+            src={gameImage}
+            alt='game'
+            className='w-full h-[220px] sm:h-[320px] object-cover rounded-2xl'
+          />
+
+          <VoteButtons
+            blueLabel={
+              game.blueLabel
+            }
+            redLabel={
+              game.redLabel
+            }
+            selected={selected}
+            onVote={vote}
+          />
+
         </div>
-
-        <h1 className='text-2xl sm:text-4xl font-black text-center break-words'>
-          {game.question}
-        </h1>
-
-        <img
-          src={gameImage}
-          alt='game'
-          className='w-full h-[220px] sm:h-[320px] object-cover rounded-2xl'
-        />
-
-        <VoteButtons
-          blueLabel={game.blueLabel}
-          redLabel={game.redLabel}
-          selected={selected}
-          onVote={vote}
-        />
       </div>
     </div>
   )
