@@ -2,7 +2,7 @@ import axios from 'axios'
 import { getDeviceId } from './utils/device'
 
 const api = axios.create({
-  baseURL: 'http://localhost:5000/api'
+  baseURL: 'https://red-or-blue-0v6a.onrender.com/api'
 })
 
 api.interceptors.request.use(async config => {
